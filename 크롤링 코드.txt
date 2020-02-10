@@ -1,0 +1,163 @@
+options = webdriver.ChromeOptions() 
+options.add_argument('--headless') #headless 모드 (창 띄우지 않고 웹 브라우저 실행 시키기) #주석 처리하면 non-headless 모드
+
+
+C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\Scripts
+
+
+네이버 실검 크롤링
+from selenium import webdriver
+import time
+from bs4 import BeautifulSoup
+
+driver = webdriver.Chrome(r'C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\chromedriver_win32\chromedriver.exe')
+
+driver.get('https://www.naver.com/')
+time.sleep(3)
+
+text = driver.page_source
+
+soup = BeautifulSoup(text, 'html.parser')
+
+for li in soup.select('#NM_RTK_ROLLING_WRAP > ul > li'):
+    rank = li.a.span.text
+    keyword = li.a.select('span')[1].text
+    print(rank, keyword)
+
+driver.quit()
+
+
+
+네이버 실검 크롤링 헤드리스
+from selenium import webdriver
+import time
+from bs4 import BeautifulSoup
+
+options = webdriver.ChromeOptions() 
+options.add_argument('headless') #headless 모드 (창 띄우지 않고 웹 브라우저 실행 시키기) #주석 처리하면 non-headless 모드
+options.add_argument('window-size=1920x1080')
+options.add_argument("disable-gpu")
+driver = webdriver.Chrome(r'C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\chromedriver_win32\chromedriver.exe', options=options)
+
+driver.get('https://www.naver.com/')
+time.sleep(3)
+
+text = driver.page_source
+
+soup = BeautifulSoup(text, 'html.parser')
+
+for li in soup.select('#NM_RTK_ROLLING_WRAP > ul > li'):
+    rank = li.a.span.text
+    keyword = li.a.select('span')[1].text
+    print(rank, keyword)
+
+driver.quit()
+
+
+
+네이버 메인화면 스크린샷 저장 헤드리스
+from selenium import webdriver
+
+options = webdriver.ChromeOptions()
+options.add_argument('headless')
+options.add_argument('window-size=1920x1080')
+options.add_argument("disable-gpu")
+driver = webdriver.Chrome(r'C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\chromedriver_win32\chromedriver.exe', options=options)
+
+driver.get('http://naver.com')
+driver.implicitly_wait(3)
+driver.get_screenshot_as_file('naver_main.png')
+
+driver.quit()
+
+
+
+뉴스 크롤링 저장(엑셀)
+from selenium import webdriver
+import time
+from bs4 import BeautifulSoup
+import pandas as pd
+
+executable_path = r'C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\chromedriver_win32\chromedriver.exe'
+options = webdriver.ChromeOptions() 
+#options.add_argument('--headless') #headless 모드 (창 띄우지 않고 웹 브라우저 실행 시키기) 
+driver = webdriver.Chrome(executable_path=executable_path, options=options)
+
+driver.get('https://media.daum.net/')
+time.sleep(3) #웹 페이지 로드를 보장하기 위해 3초 쉬기
+
+#
+
+text = driver.page_source
+#print(text)
+
+soup = BeautifulSoup(text, 'html.parser')
+
+l = []
+for li in soup.select('#mArticle > div.box_headline > ul > li'):
+    title = li.a.text.strip()
+    url = li.a['href']
+    print(title, url)
+    l.append([title, url])
+
+df = pd.DataFrame(l, columns=['title', 'url'])
+df.to_excel('daum_news_like.xlsx', index=False) 
+
+driver.quit()
+
+
+네이버 실시간 검색어 저장(엑셀)
+from selenium import webdriver
+import time
+from bs4 import BeautifulSoup
+import pandas as pd
+
+driver = webdriver.Chrome(r'C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\chromedriver_win32\chromedriver.exe')
+
+driver.get('https://www.naver.com/')
+time.sleep(3)
+
+text = driver.page_source
+
+soup = BeautifulSoup(text, 'html.parser')
+
+l = []
+for li in soup.select('#NM_RTK_ROLLING_WRAP > ul > li')[:20]:
+    rank = li.a.span.text
+    keyword = li.a.select('span')[1].text
+    print(rank, keyword)
+    l.append([rank, keyword])
+
+df = pd.DataFrame(l, columns=['rank', 'keyword'])
+df.to_excel('naver_real_time_keyword.xlsx', index=False)
+
+driver.quit()
+
+
+네이버 실시간 검색어 저장(텍스트)
+from selenium import webdriver
+import time
+from bs4 import BeautifulSoup
+
+driver = webdriver.Chrome(r'C:\Users\tae young Shin\AppData\Local\Programs\Python\Python38-32\chromedriver_win32\chromedriver.exe')
+
+driver.get('https://www.naver.com/')
+time.sleep(3)
+
+text = driver.page_source
+
+soup = BeautifulSoup(text, 'html.parser')
+
+l = []
+f = open('output.txt', 'w')
+for li in soup.select('#NM_RTK_ROLLING_WRAP > ul > li')[:20]:
+    rank = li.a.span.text
+    keyword = li.a.select('span')[1].text
+    print(rank, keyword)
+    print(rank, keyword, file=f)
+    l.append([rank, keyword])
+
+
+f.close()
+
+driver.quit()
