@@ -11,3 +11,8 @@ arr[::-1] 이면 배열을 역순으로 정렬
 
 driver.switch_to.window(driver.window_handles[-1])      #최근 열린 탭으로 활성화 탭 전환
 
+webdriver.ActionChains(driver)		#마우스, 키보드 제어
+
+.perform()				#액션 실행
+
+raise 					#직접 에러를 일으킴
